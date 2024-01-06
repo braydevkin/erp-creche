@@ -35,7 +35,7 @@ const Signup: React.FC = () => {
     },
   });
 
-  const { emailError, passwordError } = useMemo(() => {
+  const { emailError, passwordError, nameError } = useMemo(() => {
     const {
       email: emailError,
       password: passwordError,
@@ -50,6 +50,7 @@ const Signup: React.FC = () => {
   }, [form.formState.errors]);
 
   async function onSubmit(data: z.infer<typeof UserSchemaValidation>) {
+    console.log({ data });
     const request = await fetch("/api/users", {
       method: "POST",
       headers: {
@@ -70,7 +71,7 @@ const Signup: React.FC = () => {
         ),
       });
     } else {
-      console.log(response);
+      console.log({ response });
     }
   }
 
@@ -88,7 +89,7 @@ const Signup: React.FC = () => {
               placeholder="Escreva nome completo"
               {...form.register("name")}
             />
-            {emailError && <InputFieldError message={emailError} />}
+            {nameError && <InputFieldError message={nameError} />}
 
             <FormLabel>E-mail</FormLabel>
             <Input

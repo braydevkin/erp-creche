@@ -20,8 +20,11 @@ import { Input } from "@/components/ui/input";
 import InputFieldError from "@/components/InputFieldError";
 
 import { UserSchemaValidation } from "@/validations/UserValidation";
+import { useToast } from "@/components/ui/use-toast";
 
 const Signin: React.FC = () => {
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof UserSchemaValidation>>({
     resolver: zodResolver(UserSchemaValidation),
     defaultValues: {
@@ -41,15 +44,14 @@ const Signin: React.FC = () => {
   }, [form.formState.errors]);
 
   function onSubmit(data: z.infer<typeof UserSchemaValidation>) {
-    console.log(data);
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // });
+    toast({
+      title: "You submitted the following values:",
+      description: (
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+    });
   }
 
   return (
