@@ -21,8 +21,12 @@ import InputFieldError from "@/components/InputFieldError";
 
 import { UserSchemaValidation } from "@/validations/UserValidation";
 import { useToast } from "@/components/ui/use-toast";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { ToastAction } from "@/components/ui/toast";
 
 const Signin: React.FC = () => {
+  const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof UserSchemaValidation>>({
@@ -43,15 +47,24 @@ const Signin: React.FC = () => {
     };
   }, [form.formState.errors]);
 
-  function onSubmit(data: z.infer<typeof UserSchemaValidation>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+  async function onSubmit(data: z.infer<typeof UserSchemaValidation>) {
+    const logged = await signIn<"credentials">("credentials", {
+      ...data,
+      redirect: false,
     });
+
+    if (logged?.error) {
+      toast({
+        title: "Ooops...",
+        description: logged.error,
+        variant: "destructive",
+        action: (
+          <ToastAction altText="Tente Novamente">Tente Novamente</ToastAction>
+        ),
+      });
+    } else {
+      router.push("/");
+    }
   }
 
   return (
