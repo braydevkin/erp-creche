@@ -2,26 +2,25 @@
 
 import * as React from "react";
 
+import { User } from "@prisma/client";
+
 import AuthButton from "../AuthButton";
 
 type HeaderProps = {
   page: string;
+  user: Pick<User, "name" | "email"> | undefined;
 };
 
-const Header = ({ page }: HeaderProps) => {
-  const [state, setState] = React.useState(false);
-
+const Header = ({ page, user }: HeaderProps) => {
   return (
-    <nav className="w-full flex items-center justify-between px-4 bg-blue-500 shadow-lg">
+    <nav className="w-full flex items-center justify-between px-4 bg-blue-500 shadow-lg py-2">
       <div>
         <h1 className="font-bold text-white">Logo</h1>
       </div>
-      <button
-        className="text-gray-700 outline-none p-2 rounded-md focus:border-gray-400 focus:border"
-        onClick={() => setState(!state)}
-      >
+      <div>
+        <span className="text-white font-medium px-2">{user?.name ?? ""}</span>
         <AuthButton page={page} />
-      </button>
+      </div>
     </nav>
   );
 };
