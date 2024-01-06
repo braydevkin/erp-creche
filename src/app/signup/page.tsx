@@ -22,8 +22,10 @@ import InputFieldError from "@/components/InputFieldError";
 
 import { UserSchemaValidation } from "@/validations/UserValidation";
 import { ToastAction } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
 
 const Signup: React.FC = () => {
+  const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof UserSchemaValidation>>({
@@ -71,7 +73,12 @@ const Signup: React.FC = () => {
         ),
       });
     } else {
-      console.log({ response });
+      toast({
+        title: "Sucesso",
+        description: "Registro realizado com sucesso",
+        variant: "default",
+      });
+      router.push("/api/auth/signin");
     }
   }
 
