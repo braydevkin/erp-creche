@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useMemo } from "react";
-
+import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+import { UserSchemaValidation } from "@/validations/UserValidation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,14 +20,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
 import InputFieldError from "@/components/InputFieldError";
-
-import { UserSchemaValidation } from "@/validations/UserValidation";
 import { useToast } from "@/components/ui/use-toast";
 
 const Signin: React.FC = () => {
+  const router = useRouter();
   const { toast } = useToast();
+
+  const [loggedError, setLoggedError] = useState<string>("");
 
   const form = useForm<z.infer<typeof UserSchemaValidation>>({
     resolver: zodResolver(UserSchemaValidation),
@@ -43,15 +47,17 @@ const Signin: React.FC = () => {
     };
   }, [form.formState.errors]);
 
-  function onSubmit(data: z.infer<typeof UserSchemaValidation>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+  async function onSubmit(data: z.infer<typeof UserSchemaValidation>) {
+    const logged = await signIn<"credentials">("credentials", {
+      ...data,
+      redirect: false,
     });
+
+    if (logged?.error) {
+      setLoggedError(logged.error);
+    } else {
+      router.push("/scheduling");
+    }
   }
 
   return (
@@ -78,6 +84,9 @@ const Signin: React.FC = () => {
             />
             {passwordError && <InputFieldError message={passwordError} />}
 
+            <div className="w-full flex justify-end">
+              {loggedError && <InputFieldError message={loggedError} />}
+            </div>
             <FormDescription>
               Esqueceu sua senha ? Recupere clicando aqui.
             </FormDescription>
