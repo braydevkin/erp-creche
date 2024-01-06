@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useMemo } from "react";
-
+import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+import { UserSchemaValidation } from "@/validations/UserValidation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,18 +20,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
 import InputFieldError from "@/components/InputFieldError";
-
-import { UserSchemaValidation } from "@/validations/UserValidation";
 import { useToast } from "@/components/ui/use-toast";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { ToastAction } from "@/components/ui/toast";
 
 const Signin: React.FC = () => {
   const router = useRouter();
   const { toast } = useToast();
+
+  const [loggedError, setLoggedError] = useState<string>("");
 
   const form = useForm<z.infer<typeof UserSchemaValidation>>({
     resolver: zodResolver(UserSchemaValidation),
@@ -54,14 +54,7 @@ const Signin: React.FC = () => {
     });
 
     if (logged?.error) {
-      toast({
-        title: "Ooops...",
-        description: logged.error,
-        variant: "destructive",
-        action: (
-          <ToastAction altText="Tente Novamente">Tente Novamente</ToastAction>
-        ),
-      });
+      setLoggedError(logged.error);
     } else {
       router.push("/scheduling");
     }
@@ -91,6 +84,9 @@ const Signin: React.FC = () => {
             />
             {passwordError && <InputFieldError message={passwordError} />}
 
+            <div className="w-full flex justify-end">
+              {loggedError && <InputFieldError message={loggedError} />}
+            </div>
             <FormDescription>
               Esqueceu sua senha ? Recupere clicando aqui.
             </FormDescription>
