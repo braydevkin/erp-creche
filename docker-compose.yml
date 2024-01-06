@@ -1,0 +1,51 @@
+# Use postgres/example user/password credentials
+version: "3.1"
+
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: erp-creche
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s  
+    networks:
+      - erp-creche-network
+  app:
+    image: erp-creche
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+        - .:/app
+        - /app/node_modules
+        - /app/.next
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command:
+      - sh
+      - -c
+      - |
+        echo "Running App"
+        yarn install --frozen-lockfile
+        yarn prisma generate
+        yarn prisma db push
+        yarn dev
+    networks:
+      - erp-creche-network
+    environment:
+      - DATABASE_URL:postgresql://admin:admin@localhost:5432/erp-creche
+networks:
+  erp-creche-network:
+    driver: bridge
