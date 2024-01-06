@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormDescription,
@@ -15,41 +14,64 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import InputFieldError from "@/components/InputFieldError";
 
 import { UserSchemaValidation } from "@/validations/UserValidation";
+import { ToastAction } from "@/components/ui/toast";
 
-const Signin: React.FC = () => {
+const Signup: React.FC = () => {
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof UserSchemaValidation>>({
     resolver: zodResolver(UserSchemaValidation),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
   });
 
   const { emailError, passwordError } = useMemo(() => {
-    const { email: emailError, password: passwordError } =
-      form.formState.errors;
+    const {
+      email: emailError,
+      password: passwordError,
+      name: nameError,
+    } = form.formState.errors;
 
     return {
       emailError: emailError?.message,
       passwordError: passwordError?.message,
+      nameError: nameError?.message,
     };
   }, [form.formState.errors]);
 
-  function onSubmit(data: z.infer<typeof UserSchemaValidation>) {
-    console.log(data);
-    // toast({
-    //   title: "You submitted the following values:",
-    //   description: (
-    //     <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //       <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    // });
+  async function onSubmit(data: z.infer<typeof UserSchemaValidation>) {
+    const request = await fetch("/api/users", {
+      method: "POST",
+      headers: {
+        "Content-type": "applicaition/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const response = await request.json();
+
+    if (!request.ok) {
+      toast({
+        title: "Oooops...",
+        description: response.error,
+        variant: "destructive",
+        action: (
+          <ToastAction altText="Tente Novamente">Tente Novamente</ToastAction>
+        ),
+      });
+    } else {
+      console.log(response);
+    }
   }
 
   return (
@@ -60,6 +82,14 @@ const Signin: React.FC = () => {
           className="p-16 w-2/6 bg-white rounded-lg shadow-xl"
         >
           <FormItem className="flex flex-col items-start space-y-3">
+            <FormLabel>Nome</FormLabel>
+            <Input
+              type="text"
+              placeholder="Escreva nome completo"
+              {...form.register("name")}
+            />
+            {emailError && <InputFieldError message={emailError} />}
+
             <FormLabel>E-mail</FormLabel>
             <Input
               type="email"
@@ -76,9 +106,7 @@ const Signin: React.FC = () => {
             />
             {passwordError && <InputFieldError message={passwordError} />}
 
-            <FormDescription>
-              Esqueceu sua senha ? Recupere clicando aqui.
-            </FormDescription>
+            <FormDescription>Já tem conta ? Faça login</FormDescription>
             <FormMessage />
           </FormItem>
 
@@ -87,7 +115,7 @@ const Signin: React.FC = () => {
               className="bg-blue-500 hover:bg-blue-400 transition-all delay-150 hover:scale-105"
               type="submit"
             >
-              Entrar
+              Regitrar
             </Button>
           </div>
         </form>
@@ -96,4 +124,4 @@ const Signin: React.FC = () => {
   );
 };
 
-export default Signin;
+export default Signup;
