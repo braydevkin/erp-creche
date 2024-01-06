@@ -63,7 +63,7 @@ const Signin: React.FC = () => {
         ),
       });
     } else {
-      router.push("/");
+      router.push("/scheduling");
     }
   }
 
