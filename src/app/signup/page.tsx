@@ -23,6 +23,7 @@ import InputFieldError from "@/components/InputFieldError";
 import { UserSchemaValidation } from "@/validations/UserValidation";
 import { ToastAction } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Signup: React.FC = () => {
   const router = useRouter();
@@ -110,11 +111,20 @@ const Signup: React.FC = () => {
             <Input
               type="password"
               placeholder="Escreva sua senha de acesso"
+              autoComplete="on"
               {...form.register("password")}
             />
             {passwordError && <InputFieldError message={passwordError} />}
 
-            <FormDescription>Já tem conta ? Faça login</FormDescription>
+            <FormDescription>
+              Já tem conta ?{" "}
+              <Link
+                href="/signin"
+                className="text-sm font-medium w-full text-center hover:text-blue-500 hover:scale-105 transition-all delay-105"
+              >
+                Faça Login
+              </Link>
+            </FormDescription>
             <FormMessage />
           </FormItem>
 

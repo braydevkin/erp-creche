@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import InputFieldError from "@/components/InputFieldError";
 import { useToast } from "@/components/ui/use-toast";
+import Link from "next/link";
 
 const Signin: React.FC = () => {
   const router = useRouter();
@@ -80,6 +81,7 @@ const Signin: React.FC = () => {
             <Input
               type="password"
               placeholder="Escreva sua senha de acesso"
+              autoComplete="on"
               {...form.register("password")}
             />
             {passwordError && <InputFieldError message={passwordError} />}
@@ -90,10 +92,16 @@ const Signin: React.FC = () => {
             <FormDescription>
               Esqueceu sua senha ? Recupere clicando aqui.
             </FormDescription>
+            <Link
+              href="/signup"
+              className="text-sm font-medium w-full text-center hover:text-blue-500 hover:scale-105 transition-all delay-105"
+            >
+              Criar conta
+            </Link>
             <FormMessage />
           </FormItem>
 
-          <div className="w-full flex justify-end">
+          <div className="w-full flex justify-end mt-4">
             <Button
               className="bg-blue-500 hover:bg-blue-400 transition-all delay-150 hover:scale-105"
               type="submit"

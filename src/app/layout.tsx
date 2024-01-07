@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Toaster } from "@/components/ui/toaster";
 import AuthProvider from "@/components/Providers/AuthProvider";
+import IsAuthenticated from "@/components/IsAuthenticated";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +22,9 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <IsAuthenticated>{children}</IsAuthenticated>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>
