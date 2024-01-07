@@ -25,8 +25,11 @@ const IsAuthenticated: React.FC<IsAuthenticatedProps> = ({
   }, [data?.user]);
 
   useEffect(() => {
-    console.log(ADMIN_ROUTES.indexOf(pathname));
-    if (ADMIN_ROUTES.indexOf(pathname) !== -1 && user && user.role !== "ADMIN") {
+    if (
+      ADMIN_ROUTES.indexOf(pathname) !== -1 &&
+      user &&
+      user.role !== "ADMIN"
+    ) {
       router.back();
     }
     if (status === "unauthenticated" && pathname !== "/signup") {
