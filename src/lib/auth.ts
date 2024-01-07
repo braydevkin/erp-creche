@@ -5,6 +5,7 @@ import CredentialProvider from "next-auth/providers/credentials";
 import { db as prisma } from "@/lib/db";
 
 import bcrypt from "bcrypt";
+import { User } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   // @ts-ignore
@@ -16,7 +17,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req): Promise<any> {
+      async authorize(credentials): Promise<any> {
         if (!credentials?.email || !credentials?.password)
           throw new Error("Dados de Login necessarios");
 
@@ -40,6 +41,20 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+
+  callbacks: {
+    async session({ session, token }) {
+      const user = await prisma.user.findUnique({
+        where: {
+          email: token?.email as string,
+        },
+      });
+
+      const { email, name, role }: User = user as User;
+
+      return { ...session, user: { name, email, role } };
+    },
+  },
   session: {
     strategy: "jwt",
   },
